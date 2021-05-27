@@ -9,5 +9,42 @@
 <body>
   <h1>hello node</h1>
   <img src="1.png" alt="">
+  <!-- <script src="./webpack-demo/index.js"></script> -->
+  <script>
+    // `export default function (a, b) { return a+b}`
+    // `var add = require('./a.js').default console.log(add(2,3)`
+    
+    // 先eval
+    // require
+    // 动态加载code
+    
+    (
+      function(list) {
+        function require(file) {
+          var exports = {};
+          (function(exports, code) {
+            eval(code);
+          })(exports, list[file]);
+          return exports;
+        }
+        require('index.js')
+      }
+    )({
+      'index.js':`
+        var add = require('add.js').default
+        console.log(add(2,3))
+        `,
+      'add.js': `
+        exports.default = function (a, b) { 
+          console.log('add.js') 
+          return a+b }
+        `
+    });
+    
+
+    // var add = require('./a.js').default
+    // console.log(add(1,3))
+    
+  </script>
 </body>
 </html>
