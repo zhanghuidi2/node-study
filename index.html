@@ -44,7 +44,22 @@
 
     // var add = require('./a.js').default
     // console.log(add(1,3))
-    
+    function a(name) {
+      console.log(name)
+        return function () {
+          // 一直往上找到变量是作用域链，但会一个函数，函数访问上一层的变量就是闭包
+          console.log(name)
+        }
+    }
+    a('zhangdan')()
+
+    // function a(x) {
+    //   return function b(y) {
+    //     // 闭包
+    //     console.log(x+y)
+    //   }
+    // }
+    // a(2)(4)
   </script>
 </body>
 </html>
