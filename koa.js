@@ -8,7 +8,9 @@ router.get('/', async (ctx) => {
   ctx.body = '<h1>hello world!</h1>';
 })
   .get("/users", async (ctx) => {
-    ctx.body = '获取用户列表';
+    console.log(ctx.query)
+    const {id} = ctx.query
+    ctx.body = `获取用户列表 ${id ? '请求参数为：' + id : ''}` ;
   })
   .get("/users/:id", async (ctx) => {
     const { id } = ctx.params
