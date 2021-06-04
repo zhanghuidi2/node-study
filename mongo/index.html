@@ -15,6 +15,11 @@
 
 <body>
   <div id="app">
+    <el-input size="medium" v-model="keywords" placeholder="请输入内容" style="width:200px"></el-input>
+    <el-button @click="search">搜索</el-button>
+    <el-tabs v-model="activeName" type="card" @tab-click="handleClick" style="margin-top:20px">
+      <el-tab-pane :label="item.name" :name="item.type" v-for="(item, index) in tabList" :key="index"></el-tab-pane>
+    </el-tabs>
     <el-table
       :data="fruits"
       style="width: 100%">
@@ -34,11 +39,6 @@
         width="180">
       </el-table-column>
     </el-table>
-    <!-- <ul>
-      <li v-for="fruit in fruits" :key="fruit._id">
-        {{ fruit.name }} - {{ fruit.price }}
-      </li>
-    </ul> -->
     <el-pagination layout="prev, pager, next" @current-change="currentChange" :total="total"></el-pagination>
   </div>
   <script>
@@ -47,10 +47,14 @@
       data: {
         page: 1,
         total: 0,
-        fruits: []
+        fruits: [],
+        tabList: [],
+        activeName: '',
+        keywords: ''
       },
       created() {
         this.getData();
+        this.getCateGray()
       },
       methods: {
         currentChange(page) {
@@ -59,7 +63,7 @@
         },
         getData() {
           axios
-            .get(`/api/list?page=${this.page}`)
+            .get(`/api/list?page=${this.page}&keywords=${this.keywords}&categray=${this.activeName}`)
             .then(res => res.data)
             .then(({
               data
@@ -68,6 +72,31 @@
               this.fruits = data.data;
               this.total = data.pagination.total;
             });
+        },
+        getCateGray() {
+          axios
+            .get(`/api/cateGray`)
+            .then(res => res.data)
+            .then(({
+              data
+            }) => {
+              console.log(data)
+              this.tabList = data.data;
+              this.tabList.unshift({
+                name: '全部', type: ''
+              })
+            });
+        },
+        // 点击tab
+        handleClick() {
+          console.log(this.activeName)
+          this.page = 1
+          this.getData()
+        },
+        // 搜索
+        search() {
+          this.page = 1
+          this.getData()
         }
       }
     });

@@ -20,6 +20,10 @@ class Mongodb {
   col(cloName, dbName = conf.dbName) {
     return this.client.db(dbName).collection(cloName)
   }
+  // 获取到表
+  getcol(cloName, dbName = conf.dbName) {
+    return this.client.db(dbName).getCollection(cloName)
+  }
   // 执行一次, once和on的区别
   once(event, cb) {
     this.emmiter.once(event, cb)

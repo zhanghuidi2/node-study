@@ -8,10 +8,26 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/list', async (req, res) => {
-  const page = + req.query.page
+  // 查询
+  const { keywords, categray, page } = req.query
   const col = mongo.col('day01')
-  const total = await col.find().count() // 总数
-  const data = await col.find().skip((page - 1) * 5).limit(5).toArray()
+  const condition = {
+     // 价格大于5
+    // price: {
+    //   $gt: 5
+    // }
+  }
+  if (categray && categray!=0) {
+    condition.categray = categray == 1 ? '蔬菜' :'水果'
+  }
+  if (keywords) {
+    condition.name = {$regex: keywords}
+  }
+  await col.find(condition).forEach(item => {
+    col.updateMany({_id: item._id},{$set:{price: parseFloat(item.price)}})
+  })
+  const total = await col.find(condition).count() // 总数
+  const data = await col.find(condition).skip((page - 1) * 5).limit(5).sort({ price: 1 }).toArray()
   res.json({
     ok: 1,
     data: {
@@ -20,6 +36,23 @@ app.get('/api/list', async (req, res) => {
         total,
         page
       }
+    }
+  })
+})
+app.get('/api/cateGray', async (req, res) => {
+  const col = mongo.col('day01')
+  const data = await col.distinct('categray')
+  const json = []
+  data.forEach(item => {
+    json.push({
+      name: item,
+      type: item === '蔬菜' ? '1' : '2'
+    })
+  })
+  res.json({
+    ok: 1,
+    data: {
+      data: json
     }
   })
 })
