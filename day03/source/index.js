@@ -5,9 +5,7 @@ const app = new kkb()
 //   res.end('99999--000')
 // })
 app.use((cxt, next) => {
-  cxt.body = {
-    name: 'TOM'
-  }
+  cxt.body = '99'
 })
 app.listen(3000, () => {
   console.log('成功====999')
