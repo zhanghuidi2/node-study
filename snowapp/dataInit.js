@@ -4,7 +4,7 @@ var url = "mongodb://localhost:27017/";
 MongoClient.connect(url, function(err, db) {
     if (err) throw err;
     var dbo = db.db("test");
-  var myobj = [
+  var myobj = [ 
     { name: "张慧迪", age: 18, tel: '18838984178' },
     { name: "魏帅", age: 48, tel: '18838984178' },
     { name: "小黑", age: 18,tel: '18838984178'  },
@@ -362,18 +362,21 @@ MongoClient.connect(url, function(err, db) {
     },
   ]
     // 用户初始化
-    dbo.collection("users").insertMany(myobj, function(err, res) {
-        if (err) throw err;
-        console.log("文档插入成功");
-    });
+    // dbo.collection("users").insertMany(myobj, function(err, res) {
+    //     if (err) throw err;
+    //     console.log("文档插入成功");
+    // });
   //  // 首页轮播图片初始化
   //   dbo.collection("homesetting").insertMany(setting, function(err, res) {
   //     if (err) throw err;
   //     console.log("文档插入成功");
   //   });
-   // 商品初始化
-    // dbo.collection("product").insertMany(productList, function(err, res) {
-    //   if (err) throw err;
-    //   console.log("文档插入成功");
-    // });
+  //  商品初始化
+  const data = productList.map((item, index) => {
+    return {...item, _id: index+1}
+  })
+    dbo.collection("product").insertMany(data, function(err, res) {
+      if (err) throw err;
+      console.log("文档插入成功");
+    });
 });

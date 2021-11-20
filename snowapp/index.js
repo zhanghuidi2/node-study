@@ -62,17 +62,25 @@ emmiter.once('connect', async (db) => {
   // 分页查询商品列表
     .get("/productList", async (ctx) => {
       const { query } = ctx.request
-      const { keyword, page, pageNum=10 } = query
+      const { keyword, page=1, pageNum=10 } = query
       const condition = {}
       if (keyword) {
         condition.title = {$regex: keyword}
       }
       const total = await product.find(condition).count()
-      const data = await product.find(condition).skip((page-1) * pageNum).limit(pageNum).toArray()
+      const totalPage = Math.floor(total / pageNum)
+      const data = await product.find(condition).skip((page-1) * pageNum).limit(Number(pageNum)).toArray()
       ctx.body = {
         total,
-        data
+        data,
+        page: Number(page)
       }
+    })
+    // 获取商品详情
+    .get("/productDetail", async (ctx) => {
+      const { query } = ctx.request
+      const data = await product.find({_id: Number(query._id)}).toArray()
+      ctx.body = data[0]
     })
     // 新增地址
   .post('/addAddress', async (ctx) => {
