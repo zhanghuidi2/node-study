@@ -131,16 +131,22 @@ emmiter.once('connect', async (db) => {
       const data = info[0] || {}
       // 已经有数据了
       if (data._id) {
-        // 存在当前的商品
+        // 存在当前的商品直接修改数量
         if (data.productIds.includes(productId)) {
-          data.products[productId] = data.products[productId] + num
+          const index = data.products.findIndex(v => v._id == productId)
+          data.products[index].cartNum = data.products[index].cartNum + num
         } else {
+          const info = await product.find({ _id: Number(productId) }).toArray()
+          const products = { ...info[0], cartNum: num }
+
           data.productIds.push(productId)
-          data.products[productId] = num
+          data.products.push(products)
         }
         cart.updateOne({ name }, { $set: { name, productIds: data.productIds, products: data.products }})
       } else {
-        cart.insertOne({ name, productIds: [productId], products: { [productId]: num}})
+        const info = await product.find({ _id: Number(productId) }).toArray()
+        const products = [{ ...info[0], cartNum: num }]
+        cart.insertOne({ name, productIds: [productId], products })
       }
       ctx.body = {
         code: 200
@@ -154,9 +160,12 @@ emmiter.once('connect', async (db) => {
         // 删除
         const index = data.productIds.findIndex(productId)
         data.productIds.splice(index, 1)
-        delete data.products[productId]
+
+        const productsIndex = data.products.findIndex(v => v._id == productId)
+        data.products.splice(productsIndex, 1)
       } else {
-        data.products[productId] = num
+        const index = data.products.findIndex(v => v._id == productId)
+        data.products[index].cartNum =  num
       }
       cart.updateOne({ name }, { $set: { productIds: data.productIds, products: data.products } })
       
@@ -166,13 +175,14 @@ emmiter.once('connect', async (db) => {
     })
     // 删除购物车
     .delete('/cart', async (ctx) => {
-
       const { name, productIds  } = rb
       const data = await cart.find(name).toArray()[0]
       productIds.forEach(item => {
-        delete data.products[item]
         const index = data.productIds.findIndex(item)
         data.productIds.splice(index, 1)
+
+        const productsIndex = data.products.findIndex(v => v._id == productId)
+        data.products.splice(productsIndex, 1)
       })
       cart.updateOne({ name }, { $set: { productIds: data.productIds, products: data.products } })
       ctx.body = {
@@ -183,17 +193,9 @@ emmiter.once('connect', async (db) => {
     .get('/cart', async (ctx) => {
       const { query } = ctx.request
       const {name} = query
-      const data = await cart.find({ name }).toArray()
-      const productInfo = []
-      Object.keys(data.products).forEach(async item => {
-        const info = await product.find({ _id: item }).toArray()
-        productInfo.push({...info, cartNum: data.products[item]})
-      })
-      const body = {
-        productIds: data.productIds,
-        product: productInfo
-      }
-      ctx.body = body
+      const info = await cart.find({ name }).toArray()
+      const data = info[0] || {}
+      ctx.body = data
     })
 
 
