@@ -11,7 +11,7 @@ var url = "mongodb://localhost:27017/";
 let emmiter = new EventEmitter()
 const bodyparser = new BodyParser();
 app.use(bodyparser)
-MongoClient.connect(url, function (err, db) {
+MongoClient.connect(url, function (err, db) 
   if (err) throw err;
   emmiter.emit('connect', db)
 });
@@ -84,6 +84,12 @@ emmiter.once('connect', async (db) => {
       const data = await product.find({ _id: Number(query._id) }).toArray()
       ctx.body = data[0]
     })
+    // 获取地址详情
+    .get("/addressDetail", async (ctx) => {
+      const { query } = ctx.request
+      const data = await address.find({ _id: Number(query._id) }).toArray()
+      ctx.body = data[0]
+    })
     // 新增地址
     .post('/addAddress', async (ctx) => {
       const rb = ctx.request.body
@@ -114,11 +120,16 @@ emmiter.once('connect', async (db) => {
     })
     // 获取地址列表
     .get('/address', async (ctx) => {
-      const data = await address.find({}).toArray()
+      const { query } = ctx.request
+      const {name} = query
+      const data = await address.find({name}).toArray()
       const body = []
       data.forEach(item => {
         body.push({ ...item, id: item._id })
       })
+      console.log(body
+      
+      )
       ctx.body = body
     })
 
@@ -154,8 +165,10 @@ emmiter.once('connect', async (db) => {
     })
     // 编辑购物车
     .put('/editCart', async (ctx) => {
+      const rb = ctx.request.body
       const { name, productId, num } = rb
-      const data = await cart.find(name).toArray()[0]
+      const info = await cart.find({ name }).toArray()
+      const data = info[0] || {}
       if (num == 0) {
         // 删除
         const index = data.productIds.findIndex(productId)
@@ -165,29 +178,30 @@ emmiter.once('connect', async (db) => {
         data.products.splice(productsIndex, 1)
       } else {
         const index = data.products.findIndex(v => v._id == productId)
-        data.products[index].cartNum =  num
+        data.products[index].cartNum = num
+        console.log(num)
       }
-      cart.updateOne({ name }, { $set: { productIds: data.productIds, products: data.products } })
+      await cart.updateOne({ name }, { $set: { productIds: data.productIds, products: data.products } })
       
-      ctx.body = {
-        code: 201
-      }
+      ctx.body = await cart.find({ name }).toArray()
     })
     // 删除购物车
     .delete('/cart', async (ctx) => {
+      const rb = ctx.request.body
       const { name, productIds  } = rb
-      const data = await cart.find(name).toArray()[0]
+      const info = await cart.find({ name }).toArray()
+      const data = info[0] || {}
+      console.log(data)
       productIds.forEach(item => {
-        const index = data.productIds.findIndex(item)
+        const index = data.productIds.findIndex(v => v== item)
+        console.log(index)
         data.productIds.splice(index, 1)
 
-        const productsIndex = data.products.findIndex(v => v._id == productId)
+        const productsIndex = data.products.findIndex(v => v._id == item)
         data.products.splice(productsIndex, 1)
       })
-      cart.updateOne({ name }, { $set: { productIds: data.productIds, products: data.products } })
-      ctx.body = {
-        code: 201
-      }
+      await cart.updateOne({ name }, { $set: { productIds: data.productIds, products: data.products } })
+      ctx.body = await cart.find({ name }).toArray()
     })
     // 获取购物车
     .get('/cart', async (ctx) => {

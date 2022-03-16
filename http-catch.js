@@ -70,3 +70,74 @@ serve.listen(3000, () => {
 // 如果全部不走缓存的话，那么html和js之间每次请求都会变，而且两者之间会有稍微的差距，因为要现运行html，然后在运行js,基本相等
 
 // 如果有缓存，html每次都会刷新，js会走缓存
+
+
+// 洗牌算法
+// const arr = ['学生1', '学生2', '学生3', '学生4', '学生5']
+// function fun(arr) {
+//   var index = arr.length - 1
+//   while (index > 0) {
+    
+//     const newIndex = Math.floor(Math.random() * index)
+//     const tmp = arr[index]
+//     arr[index] = arr[newIndex]
+//     arr[newIndex] = tmp
+//     index--
+//   }
+//   console.log(arr);
+//   return arr
+// }
+// fun(arr)
+// fun(arr)
+// fun(arr)
+// fun(arr)
+
+
+// 二分法查找,首先是有序的数组
+
+// const arr = [23, 45, 67, 78, 98, 101]
+
+// function fun(target) {
+//   var middle = Math.floor((arr.length - 1) / 2), min = 0, index = arr.length - 1
+
+//   while (middle >= min && middle <= index) {
+//     console.log('1')
+//     // 不断地分割数组
+//     if (target > arr[middle]) {
+//       // 在后边
+//       min = middle
+//     } else if (target < arr[middle]) {
+//       // 在前面
+//       index = middle
+//     } else {
+//       return middle
+//       break
+      
+//     }
+//   }
+// }
+
+// fun(67)
+
+// 冒泡
+
+// const arr = [34, 106, 78, 98, 102, 44, 12, 4]
+
+// // 拿第一个跟后面所有的比较，最后一个永远是最大的。
+// // 经过一轮以后最后一位是最大的，每经过一次循环就会往后面拍一个最大的
+
+// function sort(arr) {
+//   for (let i = arr.length; i >= 0; i--) {
+//     for (let j = 0; j < i; j++) {
+//       if (arr[j] > arr[j + 1]) {
+//         const tmp = arr[j]
+//         arr[j] = arr[j + 1]
+//         arr[j+1] = tmp
+//       }
+//     }
+//   }
+//   return arr
+// }
+// sort(arr)
+
+
